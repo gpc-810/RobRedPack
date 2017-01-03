@@ -26,7 +26,7 @@
 
 
 
-   找到最新的红包打开，
+####找到最新的红包打开
        //模拟点击事件
        public void performClick(AccessibilityNodeInfo nodeInfo) {
            Config.setFlag(nodeInfo.getPackageName().toString());
@@ -82,5 +82,7 @@
 
        }
 
+###3.返回
+    略。
 
 
