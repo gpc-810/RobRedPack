@@ -15,13 +15,12 @@
 ###2.进入聊天界面：
    监听窗口变化：AccessibilityEvent.getEventType==AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;//在这里面判断是否是进入了聊天界面
    进入之后，扫描当前布局寻找红包节点，
-   #####
-   红包节点查找方法：
-   ######1.
+   ####红包节点查找方法：
+   #####1.
    ![Image text](https://raw.githubusercontent.com/gpc-810/RobRedPack/master/readme-image/android_tool.png)
-   ######2.
+   #####2.
    ![Image text](https://raw.githubusercontent.com/gpc-810/RobRedPack/master/readme-image/android_dump.png)
-   ######3.
+   #####3.
    ![Image text](https://raw.githubusercontent.com/gpc-810/RobRedPack/master/readme-image/weixinhongbao.png)
 
 
