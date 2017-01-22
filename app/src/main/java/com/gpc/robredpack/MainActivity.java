@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         filter.addAction(Config.ACTION_QIANGHONGBAO_SERVICE_CONNECT);
         filter.addAction(Config.ACTION_QIANGHONGBAO_SERVICE_DISCONNECT);
         registerReceiver(qhbConnectReceiver, filter);
-        ((EditText)findViewById(R.id.sleep_text)).setText(sleepTime+"");
+        ((EditText) findViewById(R.id.sleep_text)).setText(SP_Util.getSeelp(this) + "");
 
     }
 
@@ -58,8 +58,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void seve(View view){
-        sleepTime=Long.valueOf(((EditText)findViewById(R.id.sleep_text)).getText().toString());
+    public void seve(View view) {
+        try {
+            sleepTime = Long.valueOf(((EditText) findViewById(R.id.sleep_text)).getText().toString());
+        } catch (Exception e) {
+            sleepTime = 50;
+        }
+        SP_Util.saveSeelp(this, sleepTime);
+        Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
 
     }
 

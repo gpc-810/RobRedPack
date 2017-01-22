@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
-import static com.gpc.robredpack.Config.sleepTime;
 
 public class MyAccessibilityService extends AccessibilityService {
 
@@ -201,13 +200,13 @@ public class MyAccessibilityService extends AccessibilityService {
             intent.addCategory(Intent.CATEGORY_HOME);
             this.startActivity(intent);
             try {
-                Thread.sleep(sleepTime);
+                Thread.sleep(SP_Util.getSeelp(getBaseContext()));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             this.startActivity(intent);
             try {
-                Thread.sleep(sleepTime);
+                Thread.sleep(SP_Util.getSeelp(getBaseContext()));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
