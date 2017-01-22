@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">抢红包</string>
 
-    <string name="accessibility_description">启动抢红包服务，仅支持微信。</string>
+    <string name="accessibility_description">启动抢红包服务，仅支持微信、QQ红包。\n 请将微信应用程序置于Home键首页</string>
     <string name="service_name">抢红包</string>
     <string name="tips">找到[抢红包]，然后开启服务即可</string>
     <string name="open_service_title">需要开启辅助服务正常使用</string>
