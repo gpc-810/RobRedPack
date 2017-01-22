@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
+import static com.gpc.robredpack.Config.sleepTime;
 
 public class MyAccessibilityService extends AccessibilityService {
 
@@ -60,13 +61,13 @@ public class MyAccessibilityService extends AccessibilityService {
                 if (!texts.isEmpty()) {
                     for (CharSequence text : texts) {
                         String content = text.toString();
-                        Log.i("demo", "text:"+content);
-                        if (content.contains(Config.WX_HONGBAO_STRING)||content.contains(Config.QQ_HONGBAO_STRING)) {
+                        Log.i("demo", "text:" + content);
+                        if (content.contains(Config.WX_HONGBAO_STRING) || content.contains(Config.QQ_HONGBAO_STRING)) {
                             Notification notification = (Notification) event.getParcelableData();
                             PendingIntent pendingIntent = notification.contentIntent;
                             try {
                                 pendingIntent.send();
-                                MyAccessibilityService.canGet=true;
+                                MyAccessibilityService.canGet = true;
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -86,7 +87,7 @@ public class MyAccessibilityService extends AccessibilityService {
                     mCurrentWindow = WINDOW_LUCKYMONEY_RECEIVEUI;
                     //开始打开红包
                     Log.i("demo", "打开红包");
-                    openPacket();
+                    openPacket(event);
                 } else if (className.equals("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI")) {
                     mCurrentWindow = WINDOW_LUCKYMONEY_DETAIL;
                     //返回以方便下次收红包
@@ -191,10 +192,37 @@ public class MyAccessibilityService extends AccessibilityService {
 
     //打开红包
     @SuppressLint("NewApi")
-    private void openPacket() {
+    private void openPacket(AccessibilityEvent event) {
         AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
+
         if (nodeInfo == null) {
-            return;
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);// 注意
+            intent.addCategory(Intent.CATEGORY_HOME);
+            this.startActivity(intent);
+            try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            this.startActivity(intent);
+            try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            nodeInfo = getRootInActiveWindow();
+            AccessibilityNodeInfo node=findNodeInfosByText(nodeInfo,"微信");
+            node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+
+
+            if (nodeInfo == null) {
+                return;
+            }
+
+
+
         }
 
         Log.i("demo", "查找打开按钮...");
@@ -300,15 +328,15 @@ public class MyAccessibilityService extends AccessibilityService {
 
     /**
      * 判断当前服务是否正在运行
-     * */
+     */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public static boolean isRunning() {
-        if(service == null) {
+        if (service == null) {
             return false;
         }
         AccessibilityManager accessibilityManager = (AccessibilityManager) service.getSystemService(Context.ACCESSIBILITY_SERVICE);
         AccessibilityServiceInfo info = service.getServiceInfo();
-        if(info == null) {
+        if (info == null) {
             return false;
         }
         List<AccessibilityServiceInfo> list = accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC);
@@ -317,12 +345,12 @@ public class MyAccessibilityService extends AccessibilityService {
         boolean isConnect = false;
         while (iterator.hasNext()) {
             AccessibilityServiceInfo i = iterator.next();
-            if(i.getId().equals(info.getId())) {
+            if (i.getId().equals(info.getId())) {
                 isConnect = true;
                 break;
             }
         }
-        if(!isConnect) {
+        if (!isConnect) {
             return false;
         }
         return true;

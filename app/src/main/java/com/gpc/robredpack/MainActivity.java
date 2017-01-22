@@ -14,9 +14,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import static com.gpc.robredpack.Config.sleepTime;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
     private Dialog mTipsDialog;
 
     @Override
@@ -30,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         filter.addAction(Config.ACTION_QIANGHONGBAO_SERVICE_CONNECT);
         filter.addAction(Config.ACTION_QIANGHONGBAO_SERVICE_DISCONNECT);
         registerReceiver(qhbConnectReceiver, filter);
+        ((EditText)findViewById(R.id.sleep_text)).setText(sleepTime+"");
 
     }
 
@@ -50,6 +55,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
 
+
+    }
+
+    public void seve(View view){
+        sleepTime=Long.valueOf(((EditText)findViewById(R.id.sleep_text)).getText().toString());
 
     }
 

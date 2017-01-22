@@ -23,6 +23,11 @@ public class Config {
     public static final int QQ_ZONE = 3;//QQ空间红包
     public static final int QQ_CMD = 4;//QQ口令红包
 
+    public static long sleepTime=50L;
+
+
+    public static final String WX_PACKAGE_STRING = "com.tencent.mm";//QQ口令红包
+
 
 //    SharedPreferences preferences;
 //
