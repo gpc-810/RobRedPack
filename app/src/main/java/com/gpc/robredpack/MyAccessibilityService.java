@@ -134,7 +134,7 @@ public class MyAccessibilityService extends AccessibilityService {
     private void getPacket() {
         AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
         if (nodeInfo == null) {
-            return;
+            return ;
         }
         List<AccessibilityNodeInfo> listWX = (nodeInfo.findAccessibilityNodeInfosByText("微信红包"));
         List<AccessibilityNodeInfo> listQQ = (nodeInfo.findAccessibilityNodeInfosByText("QQ红包"));
@@ -231,7 +231,8 @@ public class MyAccessibilityService extends AccessibilityService {
         targetNode = findNodeInfosByText(nodeInfo, "看看大家的手气");
         if (targetNode != null) {
             performBack(this);
-            return;
+            canGet=true;
+            return ;
         }
         //通过组件名查找开红包按钮，还可通过组件id直接查找但需要知道id且id容易随版本更新而变化，旧版微信还可直接搜“開”字找到按钮
         if (targetNode == null) {
