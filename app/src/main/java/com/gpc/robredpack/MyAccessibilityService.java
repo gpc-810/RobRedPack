@@ -42,7 +42,7 @@ public class MyAccessibilityService extends AccessibilityService {
      */
     public static int QQ_SEND = 0;
 
-    private boolean isClick = false;
+    private boolean isClick=false;
 
     @Override
     public void onCreate() {
@@ -53,10 +53,10 @@ public class MyAccessibilityService extends AccessibilityService {
     public void onAccessibilityEvent(AccessibilityEvent event) {
         int eventType = event.getEventType();
         Log.e("demo", Integer.toString(eventType));
-        if (isClick) {
+
+        if (isClick){
             return;
         }
-
         switch (eventType) {
             //第一步：监听通知栏消息
             case AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED:
@@ -79,8 +79,8 @@ public class MyAccessibilityService extends AccessibilityService {
                 break;
 
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED: //是否进入了红包消息（聊天）界面
+                isClick=true;
                 String className = event.getClassName().toString();
-                isClick = true;
                 if (className.equals("com.tencent.mm.ui.LauncherUI") || className.equals("com.tencent.mobileqq.activity.SplashActivity")) {
                     mCurrentWindow = WINDOW_LAUNCHER;
                     //开始抢红包
@@ -96,12 +96,12 @@ public class MyAccessibilityService extends AccessibilityService {
                         ".luckymoney.ui.LuckyMoneyBeforeDetailUI")) {
                     mCurrentWindow = WINDOW_LUCKYMONEY_DETAIL;
                     //返回以方便下次收红包
-                    Log.i("demo", "返回");
+                    Log.i("demo", "返回");//两次返回到列表
                     performBack(this);
                 } else {
                     mCurrentWindow = WINDOW_OTHER;
                 }
-                isClick = false;
+                isClick=false;
                 break;
             case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED: //
                 if (mCurrentWindow != WINDOW_LAUNCHER) { //不在聊天界面或聊天列表，不处理
@@ -112,9 +112,9 @@ public class MyAccessibilityService extends AccessibilityService {
                 if (nodeInfo == null) {
                     return;
                 }
-                isClick = true;
+                isClick=true;
                 getPacket();
-                isClick = false;
+                isClick=false;
                 break;
 
             default:
@@ -137,6 +137,7 @@ public class MyAccessibilityService extends AccessibilityService {
     private void getPacket() {
         AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
         if (nodeInfo == null) {
+            performHomeContiue();
             return;
         }
         List<AccessibilityNodeInfo> listWX = (nodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/ao4"));
@@ -188,7 +189,43 @@ public class MyAccessibilityService extends AccessibilityService {
             return;
         }
 
+    }
 
+    /**
+     * 返回桌面继续
+     */
+    private void performHomeContiue() {
+        AccessibilityNodeInfo nodeInfo;
+        performHome(this);
+
+        try {
+            Thread.sleep(SP_Util.getSeelp(getBaseContext()));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        performHome(this);
+        try {
+            Thread.sleep(SP_Util.getSeelp(getBaseContext()));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+                performRENWU(this);
+
+//        nodeInfo = getRootInActiveWindow();
+//        if (nodeInfo == null) {
+//            Intent intentWX = new Intent();
+//            ComponentName cmp = new ComponentName("com.tencent.mm", "com.tencent.mm.ui.LauncherUI");
+//            intentWX.setAction(Intent.ACTION_MAIN);
+//            intentWX.addCategory(Intent.CATEGORY_LAUNCHER);
+//            intentWX.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            intentWX.setComponent(cmp);
+//            startActivity(intentWX);
+//            Log.e(TAG, "performHomeContiue: " + "intent");
+//        } else {
+//            AccessibilityNodeInfo node = findNodeInfosByText(nodeInfo, "微信");
+//            node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+//            Log.e(TAG, "performHomeContiue: " + "click");
+//        }
     }
 
     private boolean redPakgWX(AccessibilityNodeInfo nodeInfo, String pakgTypeString, List<AccessibilityNodeInfo> list) {
@@ -279,58 +316,32 @@ public class MyAccessibilityService extends AccessibilityService {
         // TODO: 2019/1/29  返回桌面再打开 并清除通知
         if (nodeInfo == null) {
 
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.cancelAll();
+//            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//            notificationManager.cancelAll();
+//
+//            //            Intent intent = new Intent(Intent.ACTION_MAIN);
+//            //            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);// 注意
+//            //            intent.addCategory(Intent.CATEGORY_HOME);
+//            //            this.startActivity(intent);
+            performHomeContiue();
+//            performBack(this);
+            return;
 
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);// 注意
-            intent.addCategory(Intent.CATEGORY_HOME);
-            this.startActivity(intent);
+        }
+        AccessibilityNodeInfo nodeInfo3;
+        do {
             try {
                 Thread.sleep(SP_Util.getSeelp(getBaseContext()));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            //            this.startActivity(intent);
-            //            try {
-            //                Thread.sleep(SP_Util.getSeelp(getBaseContext()));
-            //            } catch (InterruptedException e) {
-            //                e.printStackTrace();
-            //            }
-
-            nodeInfo = getRootInActiveWindow();
-            //                    AccessibilityNodeInfo node = findNodeInfosByText(nodeInfo, "微信");
-            //                    node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-            Intent intentWX = new Intent();
-            ComponentName cmp = new ComponentName("com.tencent.mm", "com.tencent.mm.ui.LauncherUI");
-            intentWX.setAction(Intent.ACTION_MAIN);
-            intentWX.addCategory(Intent.CATEGORY_LAUNCHER);
-            intentWX.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intentWX.setComponent(cmp);
-            startActivity(intentWX);
-
-
-            if (nodeInfo == null) {
-                return;
-            }
-
-
-        }
-        //        AccessibilityNodeInfo nodeInfo;
-        //        do {
-        //            try {
-        //                Thread.sleep(SP_Util.getSeelp(getBaseContext()));
-        //            } catch (InterruptedException e) {
-        //                e.printStackTrace();
-        //            }
-        //            nodeInfo = getRootInActiveWindow();
-        //        } while (nodeInfo == null);
+            nodeInfo3 = getRootInActiveWindow();
+        } while (nodeInfo3 == null);
 
         Log.i("demo", "查找打开按钮...");
         AccessibilityNodeInfo targetNode = null;
-
         //如果红包已经被抢完则直接返回
-        targetNode = findNodeInfosByText(nodeInfo, "看看大家的手气");
+        targetNode = findNodeInfosByText(nodeInfo3, "看看大家的手气", "查看领取详情");
         if (targetNode != null) {
             performBack(this);
             return;
@@ -338,8 +349,8 @@ public class MyAccessibilityService extends AccessibilityService {
         //通过组件名查找开红包按钮，还可通过组件id直接查找但需要知道id且id容易随版本更新而变化，旧版微信还可直接搜“開”字找到按钮
         if (targetNode == null) {
             Log.i("demo", "打开按钮中...");
-            for (int i = 0; i < nodeInfo.getChildCount(); i++) {
-                AccessibilityNodeInfo node = nodeInfo.getChild(i);
+            for (int i = 0; i < nodeInfo3.getChildCount(); i++) {
+                AccessibilityNodeInfo node = nodeInfo3.getChild(i);
                 if ("android.widget.Button".equals(node.getClassName())) {
                     targetNode = node;
                     break;
@@ -355,12 +366,19 @@ public class MyAccessibilityService extends AccessibilityService {
 
 
     //通过文本查找节点
-    public AccessibilityNodeInfo findNodeInfosByText(AccessibilityNodeInfo nodeInfo, String text) {
-        List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText(text);
-        if (list == null || list.isEmpty()) {
+    public AccessibilityNodeInfo findNodeInfosByText(AccessibilityNodeInfo nodeInfo, String... text) {
+        if (text == null) {
             return null;
         }
-        return list.get(0);
+        for (String s : text) {
+            List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText(s);
+            if (list == null || list.isEmpty()) {
+                continue;
+            }
+            return list.get(0);
+        }
+        return null;
+
     }
 
     //模拟点击事件
@@ -407,7 +425,11 @@ public class MyAccessibilityService extends AccessibilityService {
                 break;
 
             default:
-
+                if (nodeInfo.isClickable()) {
+                    nodeInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                } else {
+                    performClick(nodeInfo.getParent());
+                }
                 break;
         }
 
@@ -420,6 +442,28 @@ public class MyAccessibilityService extends AccessibilityService {
             return;
         }
         service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
+    }
+
+    //模拟home事件
+    public void performHome(AccessibilityService service) {
+        if (service == null) {
+            return;
+        }
+        service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
+    }
+
+    //模拟多任务事件
+    public void performRENWU(AccessibilityService service) {
+        if (service == null) {
+            return;
+        }
+        service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS);
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS);
     }
 
 
@@ -471,5 +515,6 @@ public class MyAccessibilityService extends AccessibilityService {
         Intent intent = new Intent(Config.ACTION_QIANGHONGBAO_SERVICE_CONNECT);
         sendBroadcast(intent);
         Toast.makeText(this, "已连接抢红包服务", Toast.LENGTH_SHORT).show();
+
     }
 }
