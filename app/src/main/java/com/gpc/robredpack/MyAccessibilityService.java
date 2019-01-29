@@ -42,6 +42,8 @@ public class MyAccessibilityService extends AccessibilityService {
      */
     public static int QQ_SEND = 0;
 
+    private boolean isClick = false;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -51,6 +53,9 @@ public class MyAccessibilityService extends AccessibilityService {
     public void onAccessibilityEvent(AccessibilityEvent event) {
         int eventType = event.getEventType();
         Log.e("demo", Integer.toString(eventType));
+        if (isClick) {
+            return;
+        }
 
         switch (eventType) {
             //第一步：监听通知栏消息
@@ -75,6 +80,7 @@ public class MyAccessibilityService extends AccessibilityService {
 
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED: //是否进入了红包消息（聊天）界面
                 String className = event.getClassName().toString();
+                isClick = true;
                 if (className.equals("com.tencent.mm.ui.LauncherUI") || className.equals("com.tencent.mobileqq.activity.SplashActivity")) {
                     mCurrentWindow = WINDOW_LAUNCHER;
                     //开始抢红包
@@ -95,6 +101,7 @@ public class MyAccessibilityService extends AccessibilityService {
                 } else {
                     mCurrentWindow = WINDOW_OTHER;
                 }
+                isClick = false;
                 break;
             case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED: //
                 if (mCurrentWindow != WINDOW_LAUNCHER) { //不在聊天界面或聊天列表，不处理
@@ -105,7 +112,9 @@ public class MyAccessibilityService extends AccessibilityService {
                 if (nodeInfo == null) {
                     return;
                 }
+                isClick = true;
                 getPacket();
+                isClick = false;
                 break;
 
             default:
@@ -140,7 +149,7 @@ public class MyAccessibilityService extends AccessibilityService {
         }
         for (int i = 0; i < listWX.size(); i++) {
             AccessibilityNodeInfo nodeInfo1 = listWX.get(i);
-            if (!nodeInfo1.findAccessibilityNodeInfosByText("已被领完").isEmpty()||!nodeInfo1.findAccessibilityNodeInfosByText("已领取").isEmpty()) {//包括
+            if (!nodeInfo1.findAccessibilityNodeInfosByText("已被领完").isEmpty() || !nodeInfo1.findAccessibilityNodeInfosByText("已领取").isEmpty()) {//包括
                 listWX.remove(i);
                 i--;
             }
