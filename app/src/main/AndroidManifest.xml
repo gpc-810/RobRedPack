@@ -2,7 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gpc.robredpack">
 
-    <permission android:name="android.permission.WAKE_LOCK"></permission>
+    <permission android:name="android.permission.WAKE_LOCK" />
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:allowBackup="true"
@@ -32,7 +34,6 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_config" />
         </service>
-
         <service
             android:name=".NotificationCollectorService"
             android:exported="true"
@@ -49,9 +50,12 @@
             <intent-filter>
                 <action android:name="com.gpc.robredpack.ACCESSBILITY_NOTIFICATION" />
             </intent-filter>
-
         </receiver>
 
+        <service
+            android:name=".FloatServices"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

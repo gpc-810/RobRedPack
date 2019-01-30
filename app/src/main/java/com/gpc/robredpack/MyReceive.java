@@ -17,7 +17,6 @@ public class MyReceive extends BroadcastReceiver  {
     public void onReceive(Context context, Intent intent) {
         Log.e(TAG, intent.getStringExtra("msg"));
 
-
     }
 
 }

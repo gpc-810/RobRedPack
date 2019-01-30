@@ -8,7 +8,7 @@ android {
     buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "com.gpc.robredpack"
-        minSdkVersion 18
+        minSdkVersion 23
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"

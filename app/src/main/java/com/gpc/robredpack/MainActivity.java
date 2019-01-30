@@ -7,14 +7,21 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.PixelFormat;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import static com.gpc.robredpack.Config.sleepTime;
@@ -29,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         findViewById(R.id.main_set_assist).setOnClickListener(this);
         findViewById(R.id.main_set_notification).setOnClickListener(this);
+        findViewById(R.id.main_set_hand).setOnClickListener(this);
+
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(Config.ACTION_QIANGHONGBAO_SERVICE_CONNECT);
@@ -49,10 +58,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.main_set_notification://通知使用
                 openNotificationSettings();
                 break;
+            case R.id.main_set_hand://通知使用
+                openWindowHand();
+                break;
 
             default:
 
                 break;
+        }
+
+
+    }
+
+    private void openWindowHand() {
+        if (!Settings.canDrawOverlays(this)) {
+            Toast.makeText(this, "当前无权限，请授权", Toast.LENGTH_SHORT).show();
+            startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), 0);
+        } else {
+            startService(new Intent(this, FloatServices.class));
         }
 
 
@@ -111,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 打开通知使用权
      */
     private void openNotificationSettings() {
-//        android.provider.Settings.VOLUME_NOTIFICATION
+        //        android.provider.Settings.VOLUME_NOTIFICATION
         try {
             Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
             startActivity(intent);
@@ -178,5 +201,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (!Settings.canDrawOverlays(this)) {
+                Toast.makeText(this, "授权失败", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "授权成功", Toast.LENGTH_SHORT).show();
+                startService(new Intent(this, FloatServices.class));
+            }
+        }
+    }
 
 }

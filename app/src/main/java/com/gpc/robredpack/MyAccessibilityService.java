@@ -12,9 +12,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityWindowInfo;
 import android.widget.Toast;
 
 import java.util.Iterator;
@@ -42,7 +44,7 @@ public class MyAccessibilityService extends AccessibilityService {
      */
     public static int QQ_SEND = 0;
 
-    private boolean isClick=false;
+    private boolean isClick = false;
 
     @Override
     public void onCreate() {
@@ -50,11 +52,11 @@ public class MyAccessibilityService extends AccessibilityService {
     }
 
     @Override
-    public void onAccessibilityEvent(AccessibilityEvent event) {
+    public synchronized void onAccessibilityEvent(AccessibilityEvent event) {
         int eventType = event.getEventType();
         Log.e("demo", Integer.toString(eventType));
 
-        if (isClick){
+        if (isClick) {
             return;
         }
         switch (eventType) {
@@ -79,19 +81,30 @@ public class MyAccessibilityService extends AccessibilityService {
                 break;
 
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED: //是否进入了红包消息（聊天）界面
-                isClick=true;
+                isClick = true;
                 String className = event.getClassName().toString();
                 if (className.equals("com.tencent.mm.ui.LauncherUI") || className.equals("com.tencent.mobileqq.activity.SplashActivity")) {
                     mCurrentWindow = WINDOW_LAUNCHER;
                     //开始抢红包
                     Log.i("demo", "准备抢红包...");
                     getPacket();
-                } else if (className.equals("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyReceiveUI") || ("com.tencent.mm.plugin.luckymoney.ui" +
-                        ".LuckyMoneyNotHookReceiveUI").equals(className)) {
+                } else if (className.equals("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyReceiveUI")) {
                     mCurrentWindow = WINDOW_LUCKYMONEY_RECEIVEUI;
                     //开始打开红包
-                    Log.i("demo", "打开红包");
+                    Log.i("demo LuckyUI", "打开红包");
                     openPacket(event);
+                } else if (("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyNotHookReceiveUI").equals(className)) {
+                    AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
+                    if (nodeInfo == null) {
+                        performHomeContiue();
+                        isClick = false;
+                        return;
+                    }
+                    mCurrentWindow = WINDOW_LUCKYMONEY_RECEIVEUI;
+                    //开始打开红包
+                    Log.i("demo LuckyNotHookUI", "打开红包");
+                    openPacket(event);
+
                 } else if (className.equals("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI") || className.equals("com.tencent.mm.plugin" +
                         ".luckymoney.ui.LuckyMoneyBeforeDetailUI")) {
                     mCurrentWindow = WINDOW_LUCKYMONEY_DETAIL;
@@ -101,7 +114,7 @@ public class MyAccessibilityService extends AccessibilityService {
                 } else {
                     mCurrentWindow = WINDOW_OTHER;
                 }
-                isClick=false;
+                isClick = false;
                 break;
             case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED: //
                 if (mCurrentWindow != WINDOW_LAUNCHER) { //不在聊天界面或聊天列表，不处理
@@ -112,9 +125,9 @@ public class MyAccessibilityService extends AccessibilityService {
                 if (nodeInfo == null) {
                     return;
                 }
-                isClick=true;
+                isClick = true;
                 getPacket();
-                isClick=false;
+                isClick = false;
                 break;
 
             default:
@@ -209,23 +222,23 @@ public class MyAccessibilityService extends AccessibilityService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-                performRENWU(this);
+        performRENWU(this);
 
-//        nodeInfo = getRootInActiveWindow();
-//        if (nodeInfo == null) {
-//            Intent intentWX = new Intent();
-//            ComponentName cmp = new ComponentName("com.tencent.mm", "com.tencent.mm.ui.LauncherUI");
-//            intentWX.setAction(Intent.ACTION_MAIN);
-//            intentWX.addCategory(Intent.CATEGORY_LAUNCHER);
-//            intentWX.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            intentWX.setComponent(cmp);
-//            startActivity(intentWX);
-//            Log.e(TAG, "performHomeContiue: " + "intent");
-//        } else {
-//            AccessibilityNodeInfo node = findNodeInfosByText(nodeInfo, "微信");
-//            node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-//            Log.e(TAG, "performHomeContiue: " + "click");
-//        }
+        //        nodeInfo = getRootInActiveWindow();
+        //        if (nodeInfo == null) {
+        //            Intent intentWX = new Intent();
+        //            ComponentName cmp = new ComponentName("com.tencent.mm", "com.tencent.mm.ui.LauncherUI");
+        //            intentWX.setAction(Intent.ACTION_MAIN);
+        //            intentWX.addCategory(Intent.CATEGORY_LAUNCHER);
+        //            intentWX.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        //            intentWX.setComponent(cmp);
+        //            startActivity(intentWX);
+        //            Log.e(TAG, "performHomeContiue: " + "intent");
+        //        } else {
+        //            AccessibilityNodeInfo node = findNodeInfosByText(nodeInfo, "微信");
+        //            node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+        //            Log.e(TAG, "performHomeContiue: " + "click");
+        //        }
     }
 
     private boolean redPakgWX(AccessibilityNodeInfo nodeInfo, String pakgTypeString, List<AccessibilityNodeInfo> list) {
@@ -316,46 +329,52 @@ public class MyAccessibilityService extends AccessibilityService {
         // TODO: 2019/1/29  返回桌面再打开 并清除通知
         if (nodeInfo == null) {
 
-//            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//            notificationManager.cancelAll();
-//
-//            //            Intent intent = new Intent(Intent.ACTION_MAIN);
-//            //            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);// 注意
-//            //            intent.addCategory(Intent.CATEGORY_HOME);
-//            //            this.startActivity(intent);
+            Log.e(TAG, "openPacket: null getWindows");
+            //            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            //            notificationManager.cancelAll();
+            //
+            //            //            Intent intent = new Intent(Intent.ACTION_MAIN);
+            //            //            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);// 注意
+            //            //            intent.addCategory(Intent.CATEGORY_HOME);
+            //            //            this.startActivity(intent);
             performHomeContiue();
-//            performBack(this);
-            return;
-
+            //            performBack(this);
         }
-        AccessibilityNodeInfo nodeInfo3;
-        do {
+        while (nodeInfo == null) {
+            performHomeContiue();
             try {
                 Thread.sleep(SP_Util.getSeelp(getBaseContext()));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            nodeInfo3 = getRootInActiveWindow();
-        } while (nodeInfo3 == null);
+            nodeInfo = getRootInActiveWindow();
+        }
 
         Log.i("demo", "查找打开按钮...");
         AccessibilityNodeInfo targetNode = null;
         //如果红包已经被抢完则直接返回
-        targetNode = findNodeInfosByText(nodeInfo3, "看看大家的手气", "查看领取详情");
+        targetNode = findNodeInfosByText(nodeInfo, "看看大家的手气", "查看领取详情");
+
         if (targetNode != null) {
             performBack(this);
             return;
         }
         //通过组件名查找开红包按钮，还可通过组件id直接查找但需要知道id且id容易随版本更新而变化，旧版微信还可直接搜“開”字找到按钮
         if (targetNode == null) {
-            Log.i("demo", "打开按钮中...");
-            for (int i = 0; i < nodeInfo3.getChildCount(); i++) {
-                AccessibilityNodeInfo node = nodeInfo3.getChild(i);
-                if ("android.widget.Button".equals(node.getClassName())) {
-                    targetNode = node;
-                    break;
-                }
+
+            List<AccessibilityNodeInfo> buttonList = nodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/cv0");
+            if (buttonList == null || buttonList.size() <= 0) {
+                performHomeContiue();
+                return;
             }
+            Log.i("demo", "打开按钮中...");
+            //            for (int i = 0; i < buttonList.size(); i++) {
+            //                AccessibilityNodeInfo node = nodeInfo.getChild(i);
+            //                if ("android.widget.Button".equals(node.getClassName())) {
+            targetNode = buttonList.get(0);
+            //                    break;
+            //                }
+            //            }
         }
         //若查找到打开按钮则模拟点击
         if (targetNode != null) {
