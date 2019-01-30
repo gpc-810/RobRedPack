@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -80,6 +81,7 @@ public class FloatServices extends Service {
     /**
      * 悬浮窗口 视屏
      */
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void showFloatingWindow() {
         if (Settings.canDrawOverlays(this)) {
 
