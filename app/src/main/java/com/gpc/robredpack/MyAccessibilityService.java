@@ -153,7 +153,7 @@ public class MyAccessibilityService extends AccessibilityService {
             performHomeContiue();
             return;
         }
-        List<AccessibilityNodeInfo> listWX = (nodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/ao4"));
+        List<AccessibilityNodeInfo> listWX = (nodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/aou"));
         for (int i = 0; i < listWX.size(); i++) {
             AccessibilityNodeInfo nodeInfo1 = listWX.get(i);
             if (nodeInfo1.findAccessibilityNodeInfosByText("微信红包").isEmpty()) {//不包括
@@ -168,10 +168,10 @@ public class MyAccessibilityService extends AccessibilityService {
                 i--;
             }
         }
-        List<AccessibilityNodeInfo> listWX2 = (nodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/b4m"));
+        List<AccessibilityNodeInfo> listWX2 = (nodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/b5m"));
         for (int i = 0; i < listWX2.size(); i++) {//查找[微信红包]
             AccessibilityNodeInfo nodeInfo1 = listWX2.get(i);
-            List<AccessibilityNodeInfo> list2 = nodeInfo1.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/b4q");
+            List<AccessibilityNodeInfo> list2 = nodeInfo1.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/b5q");
             if (list2 == null || list2.isEmpty()) {
                 listWX2.remove(i);
                 i--;
@@ -184,8 +184,8 @@ public class MyAccessibilityService extends AccessibilityService {
             }
         }
         for (int i = 0; i < listWX2.size(); i++) {//是否未读
-            if (listWX2.get(i).findAccessibilityNodeInfosByViewId("com.tencent.mm:id/b4n").isEmpty() && listWX2.get(i)
-                    .findAccessibilityNodeInfosByViewId("com.tencent.mm:id/mm").isEmpty()) {//没有找到未读
+            if (listWX2.get(i).findAccessibilityNodeInfosByViewId("com.tencent.mm:id/b5n").isEmpty() && listWX2.get(i)
+                    .findAccessibilityNodeInfosByViewId("com.tencent.mm:id/mv").isEmpty()) {//没有找到未读
                 listWX2.remove(i);
                 i--;
             }
@@ -362,7 +362,7 @@ public class MyAccessibilityService extends AccessibilityService {
         //通过组件名查找开红包按钮，还可通过组件id直接查找但需要知道id且id容易随版本更新而变化，旧版微信还可直接搜“開”字找到按钮
         if (targetNode == null) {
 
-            List<AccessibilityNodeInfo> buttonList = nodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/cv0");
+            List<AccessibilityNodeInfo> buttonList = nodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/cyf");
             if (buttonList == null || buttonList.size() <= 0) {
                 performHomeContiue();
                 return;
